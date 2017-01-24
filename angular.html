@@ -1,0 +1,307 @@
+<div ng-app="myApp" ng-controller="myCtrl">
+
+First Name: <input type="text" ng-model="firstName"><br>
+Last Name: <input type="text" ng-model="lastName"><br>
+<br>
+Full Name: {{firstName + " " + lastName}}
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.firstName= "John";
+    $scope.lastName= "Doe";
+});
+</script>
+
+If we consider an AngularJS application to consist of:
+
+1. View, which is the HTML.
+2. Model, which is the data available for the current view.
+3. Controller, which is the JavaScript function that makes/changes/removes/controls the data.
+**Then the scope is the Model.
+***The scope is a JavaScript object with properties and methods, which are available for both the view and the controller.
+
+Root Scope
+All applications have a $rootScope which is the scope created on the HTML element that contains the ng-app directive.
+The rootScope is available in the entire application.
+If a variable has the same name in both the current scope and in the rootScope, the application use the one in the current scope.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+    $http({
+        method : "GET",
+        url : "welcome.htm"
+    }).then(function mySucces(response) {
+        $scope.myWelcome = response.data;
+    }, function myError(response) {
+        $scope.myWelcome = response.statusText;
+    });
+});
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+    $http.get("welcome.htm")
+    .then(function(response) {
+        $scope.content = response.data;
+        $scope.statuscode = response.status;
+        $scope.statustext = response.statustext;
+    });
+});
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+    $http.get("wrongfilename.htm")
+    .then(function(response) {
+        //First function handles success
+        $scope.content = response.data;
+    }, function(response) {
+        //Second function handles error
+        $scope.content = "Something went wrong";
+    });
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+<div ng-app="myApp" ng-controller="customersCtrl"> 
+
+<ul>
+  <li ng-repeat="x in myData">
+    {{ x.Name + ', ' + x.Country }}
+  </li>
+</ul>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('customersCtrl', function($scope, $http) {
+    $http.get("customers.php").then(function(response) {
+        $scope.myData = response.data.records;
+    });
+});
+</script>
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+<div ng-app="myApp" ng-controller="customersCtrl"> 
+
+<table>
+  <tr ng-repeat="x in names">
+    <td>{{ x.Name }}</td>
+    <td>{{ x.Country }}</td>
+  </tr>
+</table>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('customersCtrl', function($scope, $http) {
+    $http.get("http://www.w3schools.com/angular/customers.php")
+    .then(function (response) {$scope.names = response.data.records;});
+});
+</script>
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+<div ng-app="myApp" ng-controller="myCtrl">
+
+<select ng-model="selectedName" ng-options="x for x in names">
+</select>
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.names = ["Emil", "Tobias", "Linus"];
+});
+</script>
+
+What are Directives?
+At a high level, directives are markers on a DOM element (such as an attribute, element name, comment or CSS class) that tell 
+AngularJS's HTML compiler ($compile) to attach a specified behaviour to that DOM element (e.g. via event listeners), or even to transform
+the DOM element and its children.
+
+****It’s important to remember that Controllers are for data only, and creating functions (event functions too!) that talk to the server and push/pull
+JSON data. No DOM manipulation should be done here, so put your jQuery tool-kit away. Directives are for DOM manipulation, and that’s up next.
+
+A directive (checkout my post on Directives from existing scripts/plug-ins) in its simplest form is a small piece of templated HTML, preferably used
+multiple times throughout an application where needed. It’s an easy way to inject DOM into your application with no effort at all, or perform custom
+DOM interactions. Directives are not simple at all; there is an incredible learning curve to fully conquering them.
+
+So what are directives useful for? A lot of things, including DOM components, for example tabs or navigation elements -
+really depends on what your app makes use of in the UI. Let me put it this way, if you’ve toyed with ng-show or ng-hide,
+those are directives (though they don’t inject DOM).
+
+From my research, you should use Services for singletons, and Factories for more complex functions
+such as Object Literals and more complicated use cases.
+
+When you create a Service (or Factory) you’ll need to use dependency injection to tell Angular it needs to grab hold of your new Service -
+otherwise you’ll get a compile error and your Controller will break. You may have noticed the function ($scope) part inside the Controller 
+declaration by now, and this is simple dependency injection. Feed it the code! You’ll also notice ['$scope] before the function ($scope) too.
+
+***Scope is an object that refers to the application model. It is an execution context for expressions. Scopes are arranged in hierarchical structure
+which mimic the DOM structure of the application. Scopes can watch expressions and propagate events.
+
+Well, you might see that instead of working with this in the factory, we’re returning an object literal. Why is that? It turns out, a service is a
+constructor function whereas a factory is not. Somewhere deep inside of this Angular world, there’s this code that calls Object.create() with the
+service constructor function, when it gets instantiated. However, a factory function is really just a function that gets called,
+which is why we have to return an object explicitly.
+
+When you create a data binding from somewhere in your view to a variable on the $scope object, AngularJS creates a "watch" internally.
+A watch means that AngularJS watches changes in the variable on the $scope object. The framework is "watching" the variable.
+Watches are created using the $scope.$watch() function.
+
+At key points in your application AngularJS calls the $scope.$digest() function. This function iterates through all watches and checks if
+any of the watched variables have changed. If a watched variable has changed, a corresponding listener function is called. The listener
+function does whatever work it needs to do, for instance changing an HTML text to reflect the new value of the watched variable. Thus,
+the $digest() function is what triggers the data binding to update.
+
+
+
+
+
+
+
+<html>
+<head>
+ <title>AngularJS Service Factory and Providers</title>
+ <script src="lib/angular.js"></script>
+</head>
+<body>
+ <div class="container" style="padding-top:20px;">
+ <div ng-app="myApp" ng-controller="myController">
+ <p>From Service: {{serviceName}}</p>
+ <p>From Factory: {{factoryName}}</p>
+ <p>From Provider: {{providerName}}</p>
+ </div>
+ </div>
+ <script>
+ //defining module
+ var app = angular.module('myApp', []);
+ 
+ //defining service
+ app.service('myService', function () {
+	 this.name = '';
+	 this.setName = function (newName) {
+		 this.name = newName;
+		 return this.name;
+	 };
+});
+ 
+ //defining factory
+ app.factory('myFactory', function () {
+	 var serviceObj = {};
+	 serviceObj.name = '';
+	 serviceObj.setName = function (newName) {
+		serviceObj.name = newName;
+	 };
+	 return serviceObj;
+});
+ 
+ //defining provider
+ app.provider('configurable', function () {
+	 var privateName = '';
+	 this.setName = function (newName) {
+		privateName = newName;
+	 };
+	 this.$get = function () {
+		 return {
+			name: privateName
+		 };
+	 };
+});
+ 
+ //configuring provider
+ app.config(function (configurableProvider) {
+	configurableProvider.setName("Saksham Chauhan");
+ });
+ 
+ //defining controller
+ app.controller('myController', function ($scope, myService, myFactory, configurable) {
+	 $scope.serviceName = myService.setName("Saksham Chauhan");
+	 
+	 myFactory.setName("Saksham Chauhan");
+	 $scope.factoryName = myFactory.name;
+	 
+	 $scope.providerName = configurable.name;
+ });
+ </script>
+</body>
+</html>
+
+Value Recipe
+Let's say that we want to have a very simple service called "clientId" that provides a string representing an authentication id
+used for some remote API. You would define it like this:
+
+var myApp = angular.module('myApp', []);
+myApp.value('clientId', 'a12345654321x');
+
+Notice: How we created an Angular module called myApp, and specified that this module definition contains a "recipe" for constructing
+the clientId service, which is a simple string in this case.
+
+And this is how you would display it via Angular's data-binding:
+
+myApp.controller('DemoController', ['clientId', function DemoController(clientId) {
+  this.clientId = clientId;
+}]);
+
+<html ng-app="myApp">
+  <body ng-controller="DemoController as demo">
+    Client ID: {{demo.clientId}}
+  </body>
+</html>
+
+Linking phase :
+
+The linking phase is where you attach the data ( $scope ) to the linking function and it should return you the linked html.
+Since the directive also specifies where this html goes or what it changes, it is already good to go. This is the function where you want to
+make changes to the linked html, i.e the html that already has the data attached to it. In angular if you write code in the linking function
+its generally the post-link function (by default). It is kind of a callback that gets called after the linking function has linked the data
+with the template.
+
+
+When should we use PUT and when should we use POST?
+The HTTP methods POST and PUT aren't the HTTP equivalent of the CRUD's create and update. They both serve a different purpose.
+It's quite possible, valid and even preferred in some occasions, to use PUT to create resources, or use POST to update resources.
+Use PUT when you can update a resource completely through a specific resource. For instance, if you know that an article resides 
+at http://example.org/article/1234, you can PUT a new resource representation of this article directly through a PUT on this URL.
+If you do not know the actual resource location, for instance, when you add a new article, but do not have any idea where to store it,
+you can POST it to an URL, and let the server decide the actual URL.
+
+
+Controller is a JavaScript constructor function. When Creating an application we need to provide initial value to the $scope object of a Controller.
+We can add property to $scope object. Before to create controller we have to create a module.
+
+Directives are designed to use as markers with DOM elements. Markers can be attribute, element name, comment or CSS class. AngularJS provides many
+in-built directives. Few of them are ngModel, ngView or ngBind. The naming standard directive follows is camel-case. Much like controllers directives
+are registered on Module. To register a directive we can use module.directive. The time we create directive by default it restricted to attribute.
+In order to create directive which will triggered by element or class name we need to use restrict. The options are as follows:-
+A – only matches attribute name
+E – only matches element name
+C – only matches class name
+M - only matches comment name
+
+In web development single page application designing is more popular than multi page application designing. Let us assume you have 3 pages in your
+application mainpage, aboutus & contactus. Using older standard of web development you created 3 html pages mainpage.html, aboutus.html & contactus.html.
+Depending upon the user requests you are redirecting the user to the respective html page. As an framework designer think for a while if we can keep
+a container or view in main page where you can display the respective pages depending upon the user request, is not this is a better approach to
+classical web development. AngularJS Routing & Views did the same. Using Routing & Views in AngularJS you can easily create single page web application
+with no page refresh on a new page redirect. To achieve this technique ng-view is act like the container & routing helps to load each page in the
+ng-view depending upon the user request. The shape of request is like the url /mainpage or /aboutus.
