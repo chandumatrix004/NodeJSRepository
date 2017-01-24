@@ -14,7 +14,7 @@ app.controller('AppCtrl', ['$scope', '$http', function($scope, $http) {
 		console.log($scope.contact);
 		$http.post('/contactList',  $scope.contact).success(function(res){
 			console.log(res);
-			refresh(); 
+			refresh();  
 		});
 	};
 	
