@@ -28,7 +28,7 @@ app.controller('AppCtrl', ['$scope', '$http', function($scope, $http) {
 	$scope.edit = function(id){
 		console.log(id);
 		$http.get('/contactList/' + id).success(function(res){
-			$scope.contact = res;
+			$scope.contact = res; 
 		});
 	};
 	
